@@ -11,7 +11,9 @@ Getaround est le Airbnb des voitures. Ce projet analyse les retards de restituti
 
 - **Dashboard** : https://NANA12A-getaround-pricing-simulator.hf.space
 - **API** : https://nana12a-getaround-api.hf.space/predict
+- **FASTAPI** : https://nana12a-getaround-api.hf.space/predict
 - **Documentation API** : https://nana12a-getaround-api.hf.space/docs
+- **health check** : https://nana12a-getaround-api.hf.space/health
 
 ## 📁 Structure du projet
 
