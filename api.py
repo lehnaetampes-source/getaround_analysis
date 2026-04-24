@@ -1,30 +1,30 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from typing import List
+from typing import List, Any
 import joblib
 import pandas as pd
 import numpy as np
-
-app = FastAPI()
-
+ 
+app = FastAPI(docs_url=None, redoc_url=None)
+ 
 # ── Load model ────────────────────────────────────────────────────────────
 try:
     model = joblib.load("pricing_model.joblib")
 except:
     model = None
-
+ 
 # ── Input schema ──────────────────────────────────────────────────────────
 class PredictInput(BaseModel):
-    input: List[List[float]]
-
+    input: List[List[Any]]
+ 
 COLUMNS = [
     "model_key", "mileage", "engine_power", "fuel", "paint_color",
     "car_type", "private_parking_available", "has_gps",
     "has_air_conditioning", "automatic_car", "has_getaround_connect",
     "has_speed_regulator", "winter_tires"
 ]
-
+ 
 # ── /predict ──────────────────────────────────────────────────────────────
 @app.post("/predict")
 def predict(data: PredictInput):
@@ -37,7 +37,7 @@ def predict(data: PredictInput):
         df[col] = df[col].astype(bool)
     predictions = model.predict(df).tolist()
     return {"prediction": predictions}
-
+ 
 # ── /docs ─────────────────────────────────────────────────────────────────
 @app.get("/docs", response_class=HTMLResponse)
 def docs():
@@ -81,7 +81,7 @@ def docs():
 <main>
   <h2>Getaround Pricing API</h2>
   <p class="subtitle">API de prédiction de prix pour l'optimisation tarifaire des véhicules Getaround.</p>
-
+ 
   <!-- /predict -->
   <div class="endpoint">
     <div class="endpoint-header">
@@ -89,13 +89,13 @@ def docs():
       <span class="path">/predict</span>
     </div>
     <p class="desc">Prédit le prix optimal par jour pour un ou plusieurs véhicules en fonction de leurs caractéristiques.</p>
-
+ 
     <div class="section-label">Input — Body JSON</div>
     <table>
       <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
       <tr><td>input</td><td>array of arrays</td><td>Liste de véhicules, chaque véhicule est un tableau de 13 valeurs</td></tr>
     </table>
-
+ 
     <div class="section-label">Ordre des valeurs par véhicule</div>
     <table>
       <tr><th>#</th><th>Champ</th><th>Type</th><th>Exemple</th></tr>
@@ -113,18 +113,18 @@ def docs():
       <tr><td>11</td><td>has_speed_regulator</td><td>bool</td><td>true</td></tr>
       <tr><td>12</td><td>winter_tires</td><td>bool</td><td>false</td></tr>
     </table>
-
+ 
     <div class="section-label">Exemple de requête</div>
     <pre>curl -X POST https://your-space.hf.space/predict \\
   -H "Content-Type: application/json" \\
   -d '{"input": [["Renault", 80000, 120, "diesel", "black", "sedan", true, true, true, false, true, true, false]]}'</pre>
-
+ 
     <div class="section-label">Exemple de réponse</div>
     <pre>{"prediction": [145.0]}</pre>
-
+ 
     <div class="note">💡 Vous pouvez passer plusieurs véhicules en même temps dans le tableau <code>input</code>.</div>
   </div>
-
+ 
   <!-- /health -->
   <div class="endpoint">
     <div class="endpoint-header">
@@ -135,12 +135,12 @@ def docs():
     <div class="section-label">Exemple de réponse</div>
     <pre>{"status": "ok", "model": "loaded"}</pre>
   </div>
-
+ 
 </main>
 </body>
 </html>
 """
-
+ 
 # ── /health ───────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
